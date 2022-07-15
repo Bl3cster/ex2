@@ -26,6 +26,8 @@ public class Main {
 
         userService.getAllUsers();
 
+        System.out.println(userService.getAllUsers());
+
         userService.cleanUsersTable();
 
         userService.dropUsersTable();

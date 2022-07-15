@@ -9,7 +9,6 @@ public class UserDaoHibernateImpl implements UserDao {
 
     }
 
-
     @Override
     public void createUsersTable() {
 
@@ -32,7 +31,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        return getAllUsers();
+        return null;
     }
 
     @Override
