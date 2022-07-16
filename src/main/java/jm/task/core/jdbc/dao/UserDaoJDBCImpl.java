@@ -52,7 +52,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void removeUserById(long id) {
         try (Statement statement = connection.createStatement()) {
-            String sql = "DELETE FROM test.users where id";
+            String sql = "DELETE FROM test.users WHERE id = " + id + " LIMIT 1 ";
             statement.executeUpdate(sql);
             System.out.println("User удален");
         } catch (SQLException e) {
