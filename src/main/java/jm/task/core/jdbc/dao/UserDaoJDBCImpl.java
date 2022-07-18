@@ -6,6 +6,7 @@ import jm.task.core.jdbc.util.Util;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UserDaoJDBCImpl implements UserDao {
     private final Connection connection = Util.getConnection();
@@ -91,5 +92,18 @@ public class UserDaoJDBCImpl implements UserDao {
             e.printStackTrace();
             System.out.println("Не удалось очистить");
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserDaoJDBCImpl that = (UserDaoJDBCImpl) o;
+        return Objects.equals(connection, that.connection);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(connection);
     }
 }

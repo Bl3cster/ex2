@@ -2,8 +2,10 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
+@Transactional
 public class UserDaoHibernateImpl implements UserDao {
     public UserDaoHibernateImpl() {
 
