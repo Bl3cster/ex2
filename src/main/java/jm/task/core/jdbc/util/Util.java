@@ -1,5 +1,9 @@
 package jm.task.core.jdbc.util;
 
+import jm.task.core.jdbc.model.User;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -9,6 +13,16 @@ public class Util {
     private static final String HOST = "jdbc:mysql://localhost:3306/test?serverTimezone=Europe/Moscow";
     private static final String LOGIN = "root";
     private static final String PASSWORD = "Blecster";
+
+    private static SessionFactory sessionFactory;
+
+    public static SessionFactory getSession(){
+        SessionFactory sessionFactory = new Configuration()
+                .addAnnotatedClass(User.class)
+                .buildSessionFactory();
+        return sessionFactory;
+    }
+
 
     public static Connection getConnection() {
         Connection connection = null;
