@@ -2,22 +2,20 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
-import javax.transaction.Transaction;
-import javax.transaction.Transactional;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Transactional
 public class UserDaoHibernateImpl implements UserDao {
     public UserDaoHibernateImpl() {
     }
-    private final Connection connection = Util.getConnection();
     private static Transaction transaction;
+    private static final SessionFactory sessionFactory = Util.getSessionFactory();
+
 
     @Override
     public void createUsersTable() {
@@ -27,58 +25,49 @@ public class UserDaoHibernateImpl implements UserDao {
                 "lastname VARCHAR(50), " +
                 "age tinyint, " +
                 "PRIMARY KEY (id))";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.executeUpdate(sql);
-            connection.commit();
-            System.out.println("Таблица создана");
-        } catch (SQLException e) {
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.createSQLQuery(sql).executeUpdate();
+            transaction.commit();
+        } catch (HibernateException e) {
+            transaction.rollback();
             e.printStackTrace();
-        }
-        try{
-            connection.rollback();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void dropUsersTable() {
         String sql = "Drop table if exists test.users";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.executeUpdate(sql);
-            connection.commit();
-            System.out.println("Таблица удалена");
-        } catch (SQLException e) {
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.delete(sql);
+            transaction.commit();
+        } catch (HibernateException e) {
+            transaction.rollback();
             e.printStackTrace();
-        }
-        try{
-            connection.rollback();
-        } catch (SQLException e) {
-            throw new RuntimeException();
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        String sql = "INSERT INTO test.users(name, lastname, age) VALUES(?,?,?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, name);
-            ps.setString(2, lastName);
-            ps.setByte(3, age);
-            ps.executeUpdate();
-            System.out.println("User с именем – " + name + " добавлен в базу данных");
-        } catch (SQLException e) {
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.save(new User(name, lastName, age));
+            transaction.commit();
+        } catch (HibernateException e) {
+            transaction.rollback();
             e.printStackTrace();
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        String sql = "DELETE FROM test.users WHERE id = " + id + " LIMIT 1 ";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.executeUpdate(sql);
-            System.out.println("User удален");
-        } catch (SQLException e) {
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.delete(session.get(User.class, id));
+            transaction.commit();
+        } catch (HibernateException e) {
+            transaction.rollback();
             e.printStackTrace();
         }
     }
@@ -86,20 +75,12 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         List<User> allUser = new ArrayList<>();
-        String sql = "SELECT id, name, lastname, age from test.users";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ResultSet resultSet = ps.executeQuery(sql);
-
-            while (resultSet.next()) {
-                User user = new User();
-                user.setId(resultSet.getLong("id"));
-                user.setName(resultSet.getString("name"));
-                user.setLastName(resultSet.getString("lastName"));
-                user.setAge(resultSet.getByte("age"));
-                allUser.add(user);
-            }
-
-        } catch (Exception e) {
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            allUser = (List<User>) session.createQuery("FROM User").getResultList();
+            transaction.commit();
+            } catch (HibernateException e) {
+            transaction.rollback();
             e.printStackTrace();
         }
         return allUser;
@@ -107,13 +88,17 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
-        String sql = "DELETE FROM test.users";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.executeUpdate(sql);
-            System.out.println("Таблица очищена");
-        } catch (SQLException e) {
+        List<User> allUser = new ArrayList<>();
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            allUser = (List<User>) session.createQuery("FROM User").getResultList();
+            for (User user: allUser){
+                session.delete(user);
+            }
+            transaction.commit();
+        } catch (HibernateException e) {
+            transaction.rollback();
             e.printStackTrace();
-            System.out.println("Не удалось очистить");
         }
     }
 }
