@@ -40,7 +40,7 @@ public class UserDaoHibernateImpl implements UserDao {
         String sql = "Drop table if exists test.users";
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.delete(sql);
+            session.createSQLQuery(sql);
             transaction.commit();
         } catch (HibernateException e) {
             transaction.rollback();
@@ -88,13 +88,9 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
-        List<User> allUser = new ArrayList<>();
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            allUser = (List<User>) session.createQuery("FROM User").getResultList();
-            for (User user: allUser){
-                session.delete(user);
-            }
+            session.createSQLQuery("TRUNCATE TABLE test.users");
             transaction.commit();
         } catch (HibernateException e) {
             transaction.rollback();
