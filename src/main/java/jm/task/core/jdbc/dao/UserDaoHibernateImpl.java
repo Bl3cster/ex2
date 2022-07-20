@@ -19,7 +19,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS test.users" +
+        String sql = "CREATE TABLE IF NOT EXISTS users" +
                 "(id bigint not null auto_increment, " +
                 "name VARCHAR(50), " +
                 "lastname VARCHAR(50), " +
@@ -37,7 +37,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-        String sql = "Drop table if exists test.users";
+        String sql = "Drop table if exists users";
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             session.createSQLQuery(sql).executeUpdate();
@@ -79,7 +79,7 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction = session.beginTransaction();
             allUser = (List<User>) session.createQuery("FROM User").getResultList();
             transaction.commit();
-            } catch (HibernateException e) {
+        } catch (HibernateException e) {
             transaction.rollback();
             e.printStackTrace();
         }
@@ -90,7 +90,7 @@ public class UserDaoHibernateImpl implements UserDao {
     public void cleanUsersTable() {
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.createSQLQuery("TRUNCATE TABLE test.users").executeUpdate();
+            session.createSQLQuery("TRUNCATE TABLE users").executeUpdate();
             transaction.commit();
         } catch (HibernateException e) {
             transaction.rollback();
