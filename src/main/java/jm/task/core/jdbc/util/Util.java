@@ -1,9 +1,11 @@
 package jm.task.core.jdbc.util;
 
+import jm.task.core.jdbc.model.User;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
 
 import java.sql.Connection;
@@ -19,29 +21,22 @@ public class Util {
     private static final String PASSWORD = "Blecster";
 
     public static SessionFactory getSessionFactory(){
-        return createSessionFactory();
-    }
-
-    private static SessionFactory createSessionFactory(){
-        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                .applySettings(getSettings()).build();
-        MetadataSources metadataSources = new MetadataSources(serviceRegistry);
-        Metadata metadata = metadataSources.buildMetadata();
-        return metadata.getSessionFactoryBuilder().build();
-
-    }
-
-    private static Map<String, String> getSettings() {
+        StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
         Map<String, String> settings = new HashMap<>();
-        settings.put("connection.driver_class", "com.mysql.cj.jdbc.Driver");
-        settings.put("dialect", "org.hibernate.dialect.MySQL8Dialect");
-        settings.put("hibernate.connection.url", "jdbc:mysql://localhost:3306/test?serverTimezone=Europe/Moscow");
-        settings.put("hibernate.connection.username", "root");
-        settings.put("hibernate.connection.password", "Blecster");
-        settings.put("hibernate.current_session_context_class", "thread");
-        settings.put("hibernate.show_sql", "true");
-        settings.put("hibernate.format_sql", "true");
-        return settings;
+        settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
+        settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL8Dialect");
+        settings.put(Environment.URL, HOST);
+        settings.put(Environment.USER, LOGIN);
+        settings.put(Environment.PASS, PASSWORD);
+        registryBuilder.applySettings(settings);
+        StandardServiceRegistry registry= registryBuilder.build();
+        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                .applySettings(settings).build();
+        MetadataSources metadataSources = new MetadataSources(registry)
+                .addAnnotatedClass(User.class);
+        SessionFactory sessionFactory = metadataSources.buildMetadata().buildSessionFactory();
+        
+        return sessionFactory;
     }
 
     public static Connection getConnection() {
