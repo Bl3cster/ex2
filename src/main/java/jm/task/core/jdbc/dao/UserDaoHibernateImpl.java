@@ -40,7 +40,7 @@ public class UserDaoHibernateImpl implements UserDao {
         String sql = "Drop table if exists test.users";
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.createSQLQuery(sql);
+            session.createSQLQuery(sql).executeUpdate();
             transaction.commit();
         } catch (HibernateException e) {
             transaction.rollback();
@@ -90,7 +90,7 @@ public class UserDaoHibernateImpl implements UserDao {
     public void cleanUsersTable() {
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.createSQLQuery("TRUNCATE TABLE test.users");
+            session.createSQLQuery("TRUNCATE TABLE test.users").executeUpdate();
             transaction.commit();
         } catch (HibernateException e) {
             transaction.rollback();
