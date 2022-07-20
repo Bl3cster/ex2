@@ -11,11 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
-    public UserDaoHibernateImpl() {
-    }
+
     private static Transaction transaction;
     private static final SessionFactory sessionFactory = Util.getSessionFactory();
 
+    public UserDaoHibernateImpl() {
+    }
 
     @Override
     public void createUsersTable() {

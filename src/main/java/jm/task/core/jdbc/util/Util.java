@@ -20,7 +20,7 @@ public class Util {
     private static final String LOGIN = "root";
     private static final String PASSWORD = "Blecster";
 
-    public static SessionFactory getSessionFactory(){
+    public static SessionFactory getSessionFactory() {
         StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
         Map<String, String> settings = new HashMap<>();
         settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
@@ -29,13 +29,13 @@ public class Util {
         settings.put(Environment.USER, LOGIN);
         settings.put(Environment.PASS, PASSWORD);
         registryBuilder.applySettings(settings);
-        StandardServiceRegistry registry= registryBuilder.build();
+        StandardServiceRegistry registry = registryBuilder.build();
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(settings).build();
         MetadataSources metadataSources = new MetadataSources(registry)
                 .addAnnotatedClass(User.class);
         SessionFactory sessionFactory = metadataSources.buildMetadata().buildSessionFactory();
-        
+
         return sessionFactory;
     }
 

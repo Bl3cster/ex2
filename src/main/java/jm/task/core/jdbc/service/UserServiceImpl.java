@@ -7,6 +7,7 @@ import java.util.List;
 
 public class UserServiceImpl implements UserService {
     private final UserDaoHibernateImpl userDao = new UserDaoHibernateImpl();
+
     public void createUsersTable() {
         userDao.createUsersTable();
     }
@@ -24,7 +25,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public List<User> getAllUsers() {
-
         return userDao.getAllUsers();
     }
 
